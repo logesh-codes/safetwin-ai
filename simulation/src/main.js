@@ -222,6 +222,8 @@ let crowdCount = 0;
 let highCrowd = false;
 let alertShown = false;
 let routeToExit = false;
+let evacuationStarted = false;
+let evacuationCompleted = false;
 
 function createPassenger(xOffset) {
   const geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
@@ -298,14 +300,18 @@ function animate() {
 if (p.position.z >= 4.5) {
   crowdCount++;
 }
-if (routeToExit) {
+if (evacuationStarted) {
 
   if (p.position.x < 8) {
-    p.position.x += 0.01;
+    p.position.x += 0.02;
   }
 
   if (p.position.z < 8) {
-    p.position.z += 0.01;
+    p.position.z += 0.02;
+  }
+  // Check if passenger reached exit
+  if (p.position.x >= 7.8 && p.position.z >= 7.8) {
+    p.visible = false;
   }
 
 }
@@ -357,9 +363,23 @@ else {
  if (highCrowd && !alertShown) {
   console.log("🚨 HIGH CROWD ALERT");
   console.log("🚪 EXTRA EXIT OPENED");
+   console.log("👥 EVACUATION STARTED");
   alertShown = true;
+   evacuationStarted = true;
 }
 }
+const remainingPassengers =
+  passengers.filter(p => p.visible).length;
+
+if (
+  evacuationStarted &&
+  remainingPassengers === 0 &&
+  !evacuationCompleted
+) {
+  console.log("✅ EVACUATION COMPLETED");
+  evacuationCompleted = true;
+}
+
   renderer.render(scene, camera);
 }
 
