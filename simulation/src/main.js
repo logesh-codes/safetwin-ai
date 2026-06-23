@@ -58,6 +58,25 @@ const rightGate = new THREE.Mesh(
 
 rightGate.position.set(1, 1, 0);
 scene.add(rightGate);
+// Gate Zone
+const gateZoneGeometry = new THREE.BoxGeometry(
+  4,
+  0.1,
+  4
+);
+
+const gateZoneMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff9999
+});
+
+const gateZone = new THREE.Mesh(
+  gateZoneGeometry,
+  gateZoneMaterial
+);
+
+gateZone.position.set(0, 0.05, 0);
+
+scene.add(gateZone);
 // Platform Area
 const platformGeometry = new THREE.BoxGeometry(
   8,
@@ -77,6 +96,25 @@ const platform = new THREE.Mesh(
 platform.position.set(0, 0.25, 5);
 
 scene.add(platform);
+// Escalator
+const escalatorGeometry = new THREE.BoxGeometry(
+  2,
+  0.5,
+  4
+);
+
+const escalatorMaterial = new THREE.MeshBasicMaterial({
+  color: 0x4444ff
+});
+
+const escalator = new THREE.Mesh(
+  escalatorGeometry,
+  escalatorMaterial
+);
+
+escalator.position.set(-6, 0.25, 5);
+
+scene.add(escalator);
 // Extra Exit Gate
 const extraExitGeometry = new THREE.BoxGeometry(
   2,
@@ -99,6 +137,44 @@ extraExit.position.set(8, 1, 8);
 extraExit.visible = false;
 
 scene.add(extraExit);
+// Exit Corridor
+const corridorGeometry = new THREE.BoxGeometry(
+  4,
+  0.2,
+  6
+);
+
+const corridorMaterial = new THREE.MeshBasicMaterial({
+  color: 0x555555
+});
+
+const corridor = new THREE.Mesh(
+  corridorGeometry,
+  corridorMaterial
+);
+
+corridor.position.set(6, 0.1, 6);
+
+scene.add(corridor);
+// Exit Zone
+const exitZoneGeometry = new THREE.BoxGeometry(
+  4,
+  0.1,
+  4
+);
+
+const exitZoneMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffff99
+});
+
+const exitZone = new THREE.Mesh(
+  exitZoneGeometry,
+  exitZoneMaterial
+);
+
+exitZone.position.set(8, 0.05, 8);
+
+scene.add(exitZone);
 // Warning Board
 const warningGeometry = new THREE.BoxGeometry(
   3,
@@ -121,11 +197,31 @@ warningBoard.position.set(0, 3, 2);
 warningBoard.visible = false;
 
 scene.add(warningBoard);
+// Digital Display Board
+const displayGeometry = new THREE.BoxGeometry(
+  4,
+  1.5,
+  0.2
+);
+
+const displayMaterial = new THREE.MeshBasicMaterial({
+  color: 0x00ff00
+});
+
+const displayBoard = new THREE.Mesh(
+  displayGeometry,
+  displayMaterial
+);
+
+displayBoard.position.set(0, 5, 2);
+
+scene.add(displayBoard);
 // Multiple Passengers
 const passengers = [];
 let crowdCount = 0;
 let highCrowd = false;
 let alertShown = false;
+let routeToExit = false;
 
 function createPassenger(xOffset) {
   const geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
@@ -202,19 +298,59 @@ function animate() {
 if (p.position.z >= 4.5) {
   crowdCount++;
 }
+if (routeToExit) {
+
+  if (p.position.x < 8) {
+    p.position.x += 0.01;
+  }
+
+  if (p.position.z < 8) {
+    p.position.z += 0.01;
+  }
+
+}
 
   });
  if (crowdCount >= 8) {
+
   highCrowd = true;
+
+  platform.material.color.set(0xff0000);
 
   extraExit.visible = true;
   warningBoard.visible = true;
+  routeToExit = true;
 
-} else {
-  highCrowd = false;
+} 
+else if (crowdCount >= 5) {
+
+  platform.material.color.set(0xffff00);
 
   extraExit.visible = false;
   warningBoard.visible = false;
+  routeToExit = false;
+
+} 
+else {
+
+  platform.material.color.set(0x00aa00);
+
+  extraExit.visible = false;
+  warningBoard.visible = false;
+  routeToExit = false;
+}
+// Update Display Board Color
+
+if (crowdCount <= 4) {
+  displayBoard.material.color.set(0x00ff00);
+}
+
+else if (crowdCount <= 7) {
+  displayBoard.material.color.set(0xffff00);
+}
+
+else {
+  displayBoard.material.color.set(0xff0000);
 }
   if (crowdCount > 0) {
   console.log("Crowd Count:", crowdCount);
